@@ -9,5 +9,5 @@ import retrofit2.http.GET;
 
 public interface KurashiruService {
     @GET("videos_sample.json")
-    Single<List<Recipe>> getRecipeMovies();
+    Single<List<Recipe>> getRecipes();
 }
