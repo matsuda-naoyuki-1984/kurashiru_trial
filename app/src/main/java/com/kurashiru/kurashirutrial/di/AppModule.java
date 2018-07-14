@@ -38,6 +38,17 @@ public class AppModule {
         return context.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
     }
 
+    @Singleton
+    @Provides
+    public KurashiruService provideKurashiruService(OkHttpClient client) {
+        return new Retrofit.Builder().client(client)
+                .baseUrl("https://s3-ap-northeast-1.amazonaws.com/data.kurashiru.com/")
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(createGson()))
+                .build()
+                .create(KurashiruService.class);
+    }
+
     private static Gson createGson() {
         return new GsonBuilder().setDateFormat("yyyy/MM/dd HH:mm:ss").create();
     }
