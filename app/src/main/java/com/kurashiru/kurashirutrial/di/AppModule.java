@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kurashiru.kurashirutrial.api.RequestInterceptor;
 import com.kurashiru.kurashirutrial.api.service.KurashiruService;
+import com.kurashiru.kurashirutrial.pref.DefaultPreference;
 
 import javax.inject.Singleton;
 
@@ -38,6 +39,11 @@ public class AppModule {
     @Provides
     public Interceptor provideRequestInterceptor(RequestInterceptor interceptor) {
         return interceptor;
+    }
+
+    @Provides
+    public DefaultPreference provideDefaultPreference() {
+        return DefaultPreference.get(context);
     }
 
     @Provides
