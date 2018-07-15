@@ -5,6 +5,8 @@ import android.databinding.BindingAdapter;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
+import com.kurashiru.kurashirutrial.model.Recipe;
+
 import javax.inject.Inject;
 
 public class RecipeViewModel extends BaseObservable implements ViewModel {
@@ -17,7 +19,11 @@ public class RecipeViewModel extends BaseObservable implements ViewModel {
     private boolean isFavorite;
 
     @Inject
-    public RecipeViewModel(){
+    public RecipeViewModel(Recipe recipe){
+        //TODO
+//        mId = recipe.getId();
+        mTitle = recipe.getAttributes().getTitle();
+        mImageUrl = recipe.getAttributes().getThumbnailSquareUrl();
     }
 
     public long getId(){
