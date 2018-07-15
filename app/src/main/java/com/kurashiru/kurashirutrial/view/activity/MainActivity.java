@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 import com.kurashiru.kurashirutrial.R;
+import com.kurashiru.kurashirutrial.view.fragment.FavoriteListFragment;
 import com.kurashiru.kurashirutrial.view.fragment.RecipeListFragment;
 
 public class MainActivity extends BaseActivity {
@@ -17,6 +18,8 @@ public class MainActivity extends BaseActivity {
     public static final String TAG = MainActivity.class.getSimpleName();
 
     private Fragment mRecipeListFragment;
+
+    private Fragment mFavoriteListFragment;
 
     public static Intent createIntent(Context context) {
         return new Intent(context, MainActivity.class);
@@ -42,7 +45,8 @@ public class MainActivity extends BaseActivity {
             case R.id.navigation_home:
                 switchFragment(mRecipeListFragment, RecipeListFragment.TAG);
                 return true;
-            case R.id.navigation_search:
+            case R.id.navigation_favorite:
+                switchFragment(mFavoriteListFragment, RecipeListFragment.TAG);
                 return true;
             case R.id.navigation_help:
                 return true;
@@ -57,9 +61,14 @@ public class MainActivity extends BaseActivity {
     private void initFragments(Bundle savedInstanceState) {
         final FragmentManager manager = getSupportFragmentManager();
         mRecipeListFragment = manager.findFragmentByTag(RecipeListFragment.TAG);
+        mFavoriteListFragment = manager.findFragmentByTag(FavoriteListFragment.TAG);
 
         if(mRecipeListFragment == null){
             mRecipeListFragment = RecipeListFragment.newInstance();
+        }
+
+        if(mFavoriteListFragment == null) {
+            mFavoriteListFragment = FavoriteListFragment.newInstance();
         }
 
         if (savedInstanceState == null) {
