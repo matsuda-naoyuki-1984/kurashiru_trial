@@ -1,4 +1,4 @@
-package com.kurashiru.kurashirutrial.repository.recipes;
+package com.kurashiru.kurashirutrial.repository.favorite;
 
 import android.content.SharedPreferences;
 
@@ -11,12 +11,12 @@ import javax.inject.Inject;
 
 import io.reactivex.Single;
 
-public class RecipesLocalDataSource {
+public class FavoritesLocalDataSource {
 
     private SharedPreferences mSharedPreferences;
 
     @Inject
-    public RecipesLocalDataSource(SharedPreferences sharedPreferences){
+    public FavoritesLocalDataSource(SharedPreferences sharedPreferences){
         mSharedPreferences = sharedPreferences;
     }
 
