@@ -1,11 +1,11 @@
 package com.kurashiru.kurashirutrial.view.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.databinding.ObservableList;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +29,8 @@ public class RecipeListFragment extends BaseFragment {
     RecipeListViewModel viewModel;
 
     FragmentRecipeListBinding mBinding;
+
+    private AlertDialog mConfirmDialog;
 
     public static RecipeListFragment newInstance() {
         return new RecipeListFragment();
@@ -69,6 +71,7 @@ public class RecipeListFragment extends BaseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mConfirmDialog = null;
     }
 
 
@@ -117,7 +120,22 @@ public class RecipeListFragment extends BaseFragment {
             ViewRecipeBinding itemBinding = holder.binding;
             itemBinding.setViewModel(viewModel);
             itemBinding.executePendingBindings();
+            holder.itemView.setOnClickListener(view -> {
+                final int clickedItemPosition = holder.getAdapterPosition();
+                onItemClicked(getItem(clickedItemPosition));
+            });
         }
+
+        private void onItemClicked(RecipeViewModel viewModel) {
+            mConfirmDialog = new AlertDialog.Builder(getActivity())
+                    .setTitle("title")
+                    .setMessage("Add to favorite?")
+                    .setPositiveButton("OK",
+                            (dialog, which) -> viewModel.addToFavorite())
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        }
+
 
         @Override
         public long getItemId(int position) {

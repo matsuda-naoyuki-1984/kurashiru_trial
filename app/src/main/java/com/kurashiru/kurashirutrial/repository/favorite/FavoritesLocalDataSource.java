@@ -1,11 +1,8 @@
 package com.kurashiru.kurashirutrial.repository.favorite;
 
-import android.content.SharedPreferences;
-
-import com.kurashiru.kurashirutrial.model.Recipe;
+import com.google.gson.GsonBuilder;
 import com.kurashiru.kurashirutrial.model.RecipeData;
-
-import java.util.List;
+import com.kurashiru.kurashirutrial.pref.DefaultPreference;
 
 import javax.inject.Inject;
 
@@ -13,19 +10,34 @@ import io.reactivex.Single;
 
 public class FavoritesLocalDataSource {
 
-    private SharedPreferences mSharedPreferences;
+    @Inject
+    DefaultPreference mDefaultPreference;
 
     @Inject
-    public FavoritesLocalDataSource(SharedPreferences sharedPreferences){
-        mSharedPreferences = sharedPreferences;
+    public FavoritesLocalDataSource() {
     }
 
     public Single<RecipeData> findAll() {
-        //TODO
-        return null;
+        return Single.create(e -> {
+            if("".equals(mDefaultPreference.getFavorites())) {
+                //FIXME
+                e.onError(new Throwable());
+                return;
+            }
+            RecipeData recipeData = new GsonBuilder()
+                    .create()
+                    .fromJson(mDefaultPreference.getFavorites(), RecipeData.class);
+            e.onSuccess(recipeData);
+        });
     }
 
-    public void updateAllAsync(List<Recipe> recipes){
-        //TODO
+    public void saveRecipe(RecipeData recipeData) {
+        mDefaultPreference.setFavorites(new GsonBuilder()
+                .create().toJson(recipeData));
+    }
+
+    public void removeRecipe(RecipeData recipeData) {
+        mDefaultPreference.setFavorites(new GsonBuilder()
+                .create().toJson(recipeData));
     }
 }

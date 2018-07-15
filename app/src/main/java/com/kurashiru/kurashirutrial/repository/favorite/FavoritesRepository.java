@@ -2,67 +2,92 @@ package com.kurashiru.kurashirutrial.repository.favorite;
 
 import com.kurashiru.kurashirutrial.model.Recipe;
 import com.kurashiru.kurashirutrial.model.RecipeData;
-import com.kurashiru.kurashirutrial.repository.recipes.RecipesLocalDataSource;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 @Singleton
 public class FavoritesRepository {
-    private RecipesLocalDataSource mRecipesLocalDataSource;
+    private FavoritesLocalDataSource mFavoritesLocalDataSource;
 
-    private Map<String, Recipe> cachedRecipes;
+    private Map<String, Recipe> mCachedFavoriteRecipes;
 
     @Inject
-    FavoritesRepository(RecipesLocalDataSource recipesLocalDataSource) {
-        mRecipesLocalDataSource = recipesLocalDataSource;
+    FavoritesRepository(FavoritesLocalDataSource favoritesLocalDataSource) {
+        mFavoritesLocalDataSource = favoritesLocalDataSource;
     }
 
     public Single<RecipeData> findAll() {
-        if (cachedRecipes != null && !cachedRecipes.isEmpty()) {
-            return Single.create(emitter -> {
-                RecipeData recipeData = new RecipeData();
-                recipeData.setData(new ArrayList<>(cachedRecipes.values()));
-                emitter.onSuccess(recipeData);
-            });
+        if (mCachedFavoriteRecipes != null && !mCachedFavoriteRecipes.isEmpty()) {
+            return Single.create(emitter -> emitter.onSuccess(createFromCachedData()));
         }
 
         return findAllFromLocal();
     }
 
     private Single<RecipeData> findAllFromLocal() {
-        return mRecipesLocalDataSource.findAll().flatMap(recipeData -> {
-            if (recipeData == null || recipeData.getData().isEmpty()) {
-                //TODO
-                return null;
-            } else {
-                refreshCache(recipeData.getData());
-                return Single.create(emitter -> emitter.onSuccess(recipeData));
-            }
+        return mFavoritesLocalDataSource.findAll().flatMap(recipeData -> {
+            refreshCache(recipeData);
+            return Single.create(emitter -> emitter.onSuccess(recipeData));
         });
     }
 
-    private void refreshCache(List<Recipe> Recipes) {
-        if (cachedRecipes == null) {
-            cachedRecipes = new LinkedHashMap<>();
+    private void refreshCache(RecipeData recipeData) {
+        if (mCachedFavoriteRecipes == null) {
+            mCachedFavoriteRecipes = new LinkedHashMap<>();
         }
-        cachedRecipes.clear();
-        for (Recipe Recipe : Recipes) {
-            cachedRecipes.put(Recipe.getId(), Recipe);
+        mCachedFavoriteRecipes.clear();
+
+        if (recipeData == null || recipeData.getData() == null) {
+            return;
+        }
+
+        for (Recipe Recipe : recipeData.getData()) {
+            mCachedFavoriteRecipes.put(Recipe.getId(), Recipe);
         }
     }
 
-    public void saveFavorite(Recipe recipe) {
-        //TODO
-        if (cachedRecipes.containsKey(recipe.getId())) {
+    public Single<Boolean> saveFavorite(Recipe recipe) {
+        return Single.create(e -> {
+            Disposable disposable = findAll().subscribeOn(Schedulers.io()).subscribe(recipeData -> {
+                save(recipe);
+            }, throwable -> {
+                refreshCache(null);
+                save(recipe);
+            });
+            e.onSuccess(true);
+        });
+    }
 
+    public void removeFavorite(Recipe recipe) {
+        remove(recipe);
+    }
+
+    private void save(Recipe recipe) {
+        if (!mCachedFavoriteRecipes.containsKey(recipe.getId())) {
+            mCachedFavoriteRecipes.put(recipe.getId(), recipe);
         }
+        mFavoritesLocalDataSource.saveRecipe(createFromCachedData());
+    }
+
+    private void remove(Recipe recipe) {
+        if (!mCachedFavoriteRecipes.containsKey(recipe.getId())) {
+            mCachedFavoriteRecipes.remove(recipe.getId());
+        }
+        mFavoritesLocalDataSource.saveRecipe(createFromCachedData());
+    }
+
+    private RecipeData createFromCachedData() {
+        RecipeData recipeData = new RecipeData();
+        recipeData.setData(new ArrayList<>(mCachedFavoriteRecipes.values()));
+        return recipeData;
     }
 }

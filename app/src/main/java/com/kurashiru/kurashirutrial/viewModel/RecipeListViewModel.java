@@ -8,7 +8,9 @@ import android.view.View;
 
 import com.annimon.stream.Stream;
 import com.kurashiru.kurashirutrial.BR;
+import com.kurashiru.kurashirutrial.di.scope.FragmentScope;
 import com.kurashiru.kurashirutrial.model.RecipeData;
+import com.kurashiru.kurashirutrial.repository.favorite.FavoritesRepository;
 import com.kurashiru.kurashirutrial.repository.recipes.RecipesRepository;
 
 import java.util.List;
@@ -19,18 +21,24 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
+@FragmentScope
 public class RecipeListViewModel extends BaseObservable implements ViewModel {
 
     private int mLoadingVisibility;
 
     private RecipesRepository mRecipesRepository;
 
+    private FavoritesRepository mFavoritesRepository;
+
     private ObservableList<RecipeViewModel> mRecipeViewModels;
 
     @Inject
-    public RecipeListViewModel(RecipesRepository recipesRepository) {
+    public RecipeListViewModel(RecipesRepository recipesRepository,
+                               FavoritesRepository favoritesRepository) {
         mRecipeViewModels = new ObservableArrayList<>();
         mRecipesRepository = recipesRepository;
+        //FIXME
+        mFavoritesRepository = favoritesRepository;
     }
 
     @Bindable
@@ -66,7 +74,7 @@ public class RecipeListViewModel extends BaseObservable implements ViewModel {
     }
 
     private List<RecipeViewModel> convertToViewModel(RecipeData recipeData) {
-        return Stream.of(recipeData.getData()).map(recipe -> new RecipeViewModel(recipe)).toList();
+        return Stream.of(recipeData.getData()).map(recipe -> new RecipeViewModel(recipe, mFavoritesRepository)).toList();
     }
 
     private void renderRecipeViews(List<RecipeViewModel> recipeViewModels) {

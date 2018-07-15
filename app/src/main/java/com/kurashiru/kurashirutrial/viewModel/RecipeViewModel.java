@@ -1,6 +1,7 @@
 package com.kurashiru.kurashirutrial.viewModel;
 
 import android.databinding.BaseObservable;
+import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
@@ -9,30 +10,42 @@ import android.text.TextUtils;
 import android.widget.ImageView;
 
 import com.kurashiru.kurashirutrial.R;
+import com.kurashiru.kurashirutrial.BR;
+import com.kurashiru.kurashirutrial.di.scope.FragmentScope;
+import com.kurashiru.kurashirutrial.model.Attributes;
 import com.kurashiru.kurashirutrial.model.Recipe;
+import com.kurashiru.kurashirutrial.repository.favorite.FavoritesRepository;
 import com.squareup.picasso.Picasso;
 
 import javax.inject.Inject;
 
+import io.reactivex.SingleObserver;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
+@FragmentScope
 public class RecipeViewModel extends BaseObservable implements ViewModel {
-    private long mId;
+    private String mId;
 
     private String mTitle;
 
     private String mImageUrl;
 
-    private boolean isFavorite;
+    private int mFavorite;
+
+    FavoritesRepository mFavoritesRepository;
 
     @Inject
-    public RecipeViewModel(Recipe recipe){
-        //TODO
-//        mId = recipe.getId();
+    public RecipeViewModel(Recipe recipe, FavoritesRepository favoritesRepository){
+        mId = recipe.getId();
         mTitle = recipe.getAttributes().getTitle();
         mImageUrl = recipe.getAttributes().getThumbnailSquareUrl();
+
+        mFavoritesRepository = favoritesRepository;
     }
 
     public long getId(){
-        return mId;
+        return 0;//TODO
     }
 
     public String getTitle() {
@@ -43,8 +56,35 @@ public class RecipeViewModel extends BaseObservable implements ViewModel {
         return mImageUrl;
     }
 
-    public boolean isFavorite() {
-        return isFavorite;
+    @Bindable
+    public int getFavorite() {
+        return mFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        //FIXME
+        this.mFavorite = favorite ? 0 : 1;
+        notifyPropertyChanged(BR.favorite);
+    }
+
+    public void addToFavorite(){
+        mFavoritesRepository.saveFavorite(convertToViewModel())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new SingleObserver<Boolean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(Boolean result) {
+                        setFavorite(result);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                    }
+                });
     }
 
     @BindingAdapter("recipeImageUrl")
@@ -69,4 +109,18 @@ public class RecipeViewModel extends BaseObservable implements ViewModel {
                     .into(imageView);
         }
     }
+
+    private Recipe convertToViewModel() {
+        //FIXME
+        Recipe recipe = new Recipe();
+        recipe.setId(mId);
+        recipe.setType("video");
+        Attributes attributes = new Attributes();
+        attributes.setTitle(mTitle);
+        attributes.setThumbnailSquareUrl(mImageUrl);
+        recipe.setAttributes(attributes);
+        return recipe;
+    }
 }
+
+
