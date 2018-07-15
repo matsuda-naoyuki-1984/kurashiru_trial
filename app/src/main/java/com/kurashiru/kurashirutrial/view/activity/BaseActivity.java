@@ -10,7 +10,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 
+import com.kurashiru.kurashirutrial.MainApplication;
+import com.kurashiru.kurashirutrial.di.ActivityComponent;
+import com.kurashiru.kurashirutrial.di.ActivityModule;
+
 public abstract class BaseActivity extends AppCompatActivity {
+    private ActivityComponent activityComponent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +30,15 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+    }
+
+    @NonNull
+    public ActivityComponent getComponent() {
+        if (activityComponent == null) {
+            MainApplication mainApplication = (MainApplication) getApplication();
+            activityComponent = mainApplication.getComponent().plus(new ActivityModule(this));
+        }
+        return activityComponent;
     }
 
     @Override
