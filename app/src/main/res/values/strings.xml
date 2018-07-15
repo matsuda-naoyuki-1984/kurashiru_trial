@@ -5,4 +5,7 @@
     <string name="title_notifications">Notifications</string>
 
     <string name="recipe">Recipe</string>
+
+    <string name="snackbar_message_added_to_favorites">%sをお気に入りに追加しました</string>
+    <string name="snackbar_button_message">Remove</string>
 </resources>

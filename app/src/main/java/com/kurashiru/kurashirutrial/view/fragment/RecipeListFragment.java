@@ -21,6 +21,10 @@ import com.kurashiru.kurashirutrial.viewModel.RecipeViewModel;
 
 import javax.inject.Inject;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 public class RecipeListFragment extends BaseFragment {
 
     public static final String TAG = RecipeListFragment.class.getSimpleName();
@@ -131,9 +135,26 @@ public class RecipeListFragment extends BaseFragment {
                     .setTitle("title")
                     .setMessage("Add to favorite?")
                     .setPositiveButton("OK",
-                            (dialog, which) -> viewModel.addToFavorite())
+                            (dialog, which) -> addToFavorite(viewModel))
                     .setNegativeButton("Cancel", null)
                     .show();
+        }
+
+        private void addToFavorite(RecipeViewModel viewModel){
+            //FIXME
+            Disposable disposable = viewModel.addToFavorite()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(result -> {
+
+                        String message = String.format(getContext()
+                                .getResources()
+                                .getString(R.string.snackbar_message_added_to_favorites),
+                                viewModel.getTitle());
+                        showSnackbar(message, R.string.snackbar_button_message, view -> {
+                            viewModel.removeFavorite();
+                        });
+                    }, throwable -> {});
         }
 
 

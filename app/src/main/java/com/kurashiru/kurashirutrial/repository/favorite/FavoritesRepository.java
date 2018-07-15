@@ -67,8 +67,11 @@ public class FavoritesRepository {
         });
     }
 
-    public void removeFavorite(Recipe recipe) {
-        remove(recipe);
+    public Single<Boolean> removeFavorite(Recipe recipe) {
+        return Single.create(e -> {
+            remove(recipe);
+            e.onSuccess(true);
+        });
     }
 
     private void save(Recipe recipe) {
@@ -79,7 +82,7 @@ public class FavoritesRepository {
     }
 
     private void remove(Recipe recipe) {
-        if (!mCachedFavoriteRecipes.containsKey(recipe.getId())) {
+        if (mCachedFavoriteRecipes.containsKey(recipe.getId())) {
             mCachedFavoriteRecipes.remove(recipe.getId());
         }
         mFavoritesLocalDataSource.saveRecipe(createFromCachedData());

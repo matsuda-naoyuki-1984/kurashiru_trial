@@ -19,7 +19,7 @@ import com.squareup.picasso.Picasso;
 
 import javax.inject.Inject;
 
-import io.reactivex.SingleObserver;
+import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -67,24 +67,20 @@ public class RecipeViewModel extends BaseObservable implements ViewModel {
         notifyPropertyChanged(BR.favorite);
     }
 
-    public void addToFavorite(){
-        mFavoritesRepository.saveFavorite(convertToViewModel())
+    public Single<Boolean> addToFavorite(){
+        return mFavoritesRepository.saveFavorite(convertToViewModel())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new SingleObserver<Boolean>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
-                    @Override
-                    public void onSuccess(Boolean result) {
-                        setFavorite(result);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                    }
+                .map(result -> {
+                    setFavorite(result);
+                    return result;
                 });
+    }
+
+    public void removeFavorite(){
+        //FIXME
+        Disposable disposable = mFavoritesRepository.removeFavorite(convertToViewModel())
+                .subscribeOn(Schedulers.io())
+                .subscribe(aBoolean -> setFavorite(false), throwable -> {});
     }
 
     @BindingAdapter("recipeImageUrl")
