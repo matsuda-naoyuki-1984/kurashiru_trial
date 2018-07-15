@@ -1,7 +1,11 @@
 package com.kurashiru.kurashirutrial.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Attributes {
     private String title;
+
+    @SerializedName("thumbnail-square-url")
     private String thumbnailSquareUrl;
 
     public String getTitle() {
