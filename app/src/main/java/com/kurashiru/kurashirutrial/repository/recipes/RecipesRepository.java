@@ -1,6 +1,7 @@
 package com.kurashiru.kurashirutrial.repository.recipes;
 
 import com.kurashiru.kurashirutrial.model.Recipe;
+import com.kurashiru.kurashirutrial.model.RecipeData;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -24,17 +25,18 @@ public class RecipesRepository {
     private boolean isDirty;
 
     @Inject
-    public RecipesRepository(RecipesRemoteDataSource recipesRemoteDataSource, RecipesLocalDataSource recipesLocalDataSource){
+    RecipesRepository(RecipesRemoteDataSource recipesRemoteDataSource, RecipesLocalDataSource recipesLocalDataSource){
         mRecipesRemoteDataSource = recipesRemoteDataSource;
         mRecipesLocalDataSource = recipesLocalDataSource;
         this.isDirty = true;
     }
 
-
-    public Single<List<Recipe>> findAll() {
+    public Single<RecipeData> findAll() {
         if (cachedRecipes != null && !cachedRecipes.isEmpty() && !isDirty) {
             return Single.create(emitter -> {
-                emitter.onSuccess(new ArrayList<>(cachedRecipes.values()));
+                RecipeData recipeData = new RecipeData();
+                recipeData.setData(new ArrayList<>(cachedRecipes.values()));
+                emitter.onSuccess(recipeData);
             });
         }
 
@@ -45,22 +47,21 @@ public class RecipesRepository {
         }
     }
 
-
-    private Single<List<Recipe>> findAllFromRemote() {
+    private Single<RecipeData> findAllFromRemote() {
         return mRecipesRemoteDataSource.findAll()
-                .doOnSuccess(Recipes -> {
-                    refreshCache(Recipes);
-                    mRecipesLocalDataSource.updateAllAsync(Recipes);
+                .doOnSuccess(recipeData -> {
+                    refreshCache(recipeData.getData());
+                    mRecipesLocalDataSource.updateAllAsync(recipeData.getData());
                 });
     }
 
-    private Single<List<Recipe>> findAllFromLocal() {
-        return mRecipesLocalDataSource.findAll().flatMap(Recipes -> {
-            if (Recipes.isEmpty()) {
+    private Single<RecipeData> findAllFromLocal() {
+        return mRecipesLocalDataSource.findAll().flatMap(recipeData -> {
+            if (recipeData == null || recipeData.getData().isEmpty()) {
                 return findAllFromRemote();
             } else {
-                refreshCache(Recipes);
-                return Single.create(emitter -> emitter.onSuccess(Recipes));
+                refreshCache(recipeData.getData());
+                return Single.create(emitter -> emitter.onSuccess(recipeData));
             }
         });
     }

@@ -1,6 +1,7 @@
 package com.kurashiru.kurashirutrial.repository.recipes;
 
 import com.kurashiru.kurashirutrial.model.Recipe;
+import com.kurashiru.kurashirutrial.model.RecipeData;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class RecipesLocalDataSource {
     public RecipesLocalDataSource(){
     }
 
-    public Single<List<Recipe>> findAll() {
+    public Single<RecipeData> findAll() {
         //TODO
         return null;
     }

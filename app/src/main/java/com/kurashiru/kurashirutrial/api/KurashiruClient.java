@@ -1,9 +1,7 @@
 package com.kurashiru.kurashirutrial.api;
 
 import com.kurashiru.kurashirutrial.api.service.KurashiruService;
-import com.kurashiru.kurashirutrial.model.Recipe;
-
-import java.util.List;
+import com.kurashiru.kurashirutrial.model.RecipeData;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -19,7 +17,7 @@ public class KurashiruClient {
         mKurashiruService = kurashiruService;
     }
 
-    public Single<List<Recipe>> getRecipes() {
+    public Single<RecipeData> getRecipes() {
         return mKurashiruService.getRecipes();
     }
 }

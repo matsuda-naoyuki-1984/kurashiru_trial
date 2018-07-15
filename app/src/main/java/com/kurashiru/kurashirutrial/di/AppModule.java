@@ -6,12 +6,14 @@ import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.kurashiru.kurashirutrial.api.RequestInterceptor;
 import com.kurashiru.kurashirutrial.api.service.KurashiruService;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -31,6 +33,11 @@ public class AppModule {
     @Provides
     public Context provideContext() {
         return context;
+    }
+
+    @Provides
+    public Interceptor provideRequestInterceptor(RequestInterceptor interceptor) {
+        return interceptor;
     }
 
     @Provides
