@@ -63,10 +63,11 @@ public class RecipeListViewModel extends BaseObservable implements ViewModel {
         setLoadingVisibility(View.VISIBLE);
 
         //TODO
-        Disposable disposable = mRecipesRepository
-                .findAll()
-                .map(this::convertToViewModel)
+        Disposable disposable = mFavoritesRepository.findAll()
                 .subscribeOn(Schedulers.io())
+                .flatMap(recipeData -> mRecipesRepository
+                        .findAll()
+                        .map(this::convertToViewModel))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::renderRecipeViews,
                         throwable -> {

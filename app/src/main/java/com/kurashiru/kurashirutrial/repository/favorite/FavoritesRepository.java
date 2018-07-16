@@ -33,6 +33,10 @@ public class FavoritesRepository {
         return findAllFromLocal();
     }
 
+    public boolean exists(String targetRecipeId) {
+        return mCachedFavoriteRecipes.containsKey(targetRecipeId);
+    }
+
     private Single<RecipeData> findAllFromLocal() {
         return mFavoritesLocalDataSource.findAll().flatMap(recipeData -> {
             refreshCache(recipeData);

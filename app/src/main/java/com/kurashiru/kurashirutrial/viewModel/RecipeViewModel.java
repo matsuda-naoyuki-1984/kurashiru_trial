@@ -2,12 +2,6 @@ package com.kurashiru.kurashirutrial.viewModel;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.databinding.BindingAdapter;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.text.TextUtils;
-import android.widget.ImageView;
 
 import com.kurashiru.kurashirutrial.R;
 import com.kurashiru.kurashirutrial.BR;
@@ -15,7 +9,6 @@ import com.kurashiru.kurashirutrial.di.scope.FragmentScope;
 import com.kurashiru.kurashirutrial.model.Attributes;
 import com.kurashiru.kurashirutrial.model.Recipe;
 import com.kurashiru.kurashirutrial.repository.favorite.FavoritesRepository;
-import com.squareup.picasso.Picasso;
 
 import javax.inject.Inject;
 
@@ -42,6 +35,8 @@ public class RecipeViewModel extends BaseObservable implements ViewModel {
         mImageUrl = recipe.getAttributes().getThumbnailSquareUrl();
 
         mFavoritesRepository = favoritesRepository;
+        setFavorite(mFavoritesRepository.exists(mId));
+
     }
 
     public long getId(){
@@ -62,8 +57,7 @@ public class RecipeViewModel extends BaseObservable implements ViewModel {
     }
 
     public void setFavorite(boolean favorite) {
-        //FIXME
-        this.mFavorite = favorite ? 0 : 1;
+        this.mFavorite = favorite ? R.drawable.favorite_icon : 0;
         notifyPropertyChanged(BR.favorite);
     }
 
@@ -81,29 +75,6 @@ public class RecipeViewModel extends BaseObservable implements ViewModel {
         Disposable disposable = mFavoritesRepository.removeFavorite(convertToViewModel())
                 .subscribeOn(Schedulers.io())
                 .subscribe(aBoolean -> setFavorite(false), throwable -> {});
-    }
-
-    @BindingAdapter("recipeImageUrl")
-    public static void setRecipeImageUrl(ImageView imageView, @Nullable String imageUrl) {
-        setPhotoImageUrl(imageView, imageUrl);
-    }
-
-    private static void setPhotoImageUrl(ImageView imageView, @Nullable String imageUrl) {
-        setImageUrl(imageView, imageUrl, R.color.grey200);
-    }
-
-    private static void setImageUrl(ImageView imageView, @Nullable String imageUrl,
-                                    @DrawableRes int placeholderResId) {
-        if (TextUtils.isEmpty(imageUrl)) {
-            imageView.setImageDrawable(
-                    ContextCompat.getDrawable(imageView.getContext(), placeholderResId));
-        } else {
-            Picasso.with(imageView.getContext())
-                    .load(imageUrl)
-                    .placeholder(placeholderResId)
-                    .error(placeholderResId)
-                    .into(imageView);
-        }
     }
 
     private Recipe convertToViewModel() {
