@@ -77,6 +77,7 @@ public class MainActivity extends BaseActivity {
 
     private boolean switchFragment(@NonNull Fragment fragment, @NonNull String tag) {
         if (fragment.isAdded()) {
+            scrollToTop(R.id.recycler_view);
             return false;
         }
 

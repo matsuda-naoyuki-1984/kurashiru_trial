@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 
@@ -62,4 +63,11 @@ public abstract class BaseActivity extends AppCompatActivity {
         ft.commit();
     }
 
+    final void scrollToTop(int recycleViewId){
+        RecyclerView mRecyclerView = findViewById(recycleViewId);
+        if (mRecyclerView == null) {
+            return;
+        }
+        mRecyclerView.smoothScrollToPosition(0);
+    }
 }
