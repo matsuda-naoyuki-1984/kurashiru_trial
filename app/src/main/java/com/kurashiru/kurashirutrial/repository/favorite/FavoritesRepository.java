@@ -80,7 +80,10 @@ public class FavoritesRepository {
 
     private void save(Recipe recipe) {
         if (!mCachedFavoriteRecipes.containsKey(recipe.getId())) {
+            LinkedHashMap<String, Recipe> newMap = new LinkedHashMap<>(mCachedFavoriteRecipes);
+            mCachedFavoriteRecipes.clear();
             mCachedFavoriteRecipes.put(recipe.getId(), recipe);
+            mCachedFavoriteRecipes.putAll(newMap);
         }
         mFavoritesLocalDataSource.saveRecipe(createFromCachedData());
     }
