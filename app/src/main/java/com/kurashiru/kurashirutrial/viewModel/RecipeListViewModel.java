@@ -55,7 +55,7 @@ public class RecipeListViewModel extends BaseObservable implements ViewModel {
         return mRecipeViewModels;
     }
 
-    public void start(){
+    public void start() {
         loadRecipes();
     }
 
@@ -64,12 +64,15 @@ public class RecipeListViewModel extends BaseObservable implements ViewModel {
 
         //TODO
         Disposable disposable = mFavoritesRepository.findAll()
+                .subscribeOn(Schedulers.io()).subscribe(recipeData -> {
+                }, throwable -> {
+                });
+
+        Disposable disposable2 = mRecipesRepository
+                .findAll()
                 .subscribeOn(Schedulers.io())
-                .flatMap(recipeData -> mRecipesRepository
-                        .findAll()
-                        .map(this::convertToViewModel))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::renderRecipeViews,
+                .subscribe(recipeData -> renderRecipeViews(convertToViewModel(recipeData)),
                         throwable -> {
                         });
     }

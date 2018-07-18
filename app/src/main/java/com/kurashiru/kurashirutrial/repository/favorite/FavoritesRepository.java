@@ -34,7 +34,8 @@ public class FavoritesRepository {
     }
 
     public boolean exists(String targetRecipeId) {
-        return mCachedFavoriteRecipes.containsKey(targetRecipeId);
+        return mCachedFavoriteRecipes != null
+                && mCachedFavoriteRecipes.containsKey(targetRecipeId);
     }
 
     private Single<RecipeData> findAllFromLocal() {
