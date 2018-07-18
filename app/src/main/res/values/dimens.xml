@@ -6,4 +6,8 @@
     <!-- Recipe List -->
     <dimen name="recipe_grid_border_width">1dp</dimen>
 
+    <dimen name="recipe_title_padding">3dp</dimen>
+    <dimen name="recipe_favorite_icon_padding">3dp</dimen>
+
+    <dimen name="recipe_title_size">12sp</dimen>
 </resources>

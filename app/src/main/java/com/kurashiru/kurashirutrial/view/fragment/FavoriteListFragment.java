@@ -16,6 +16,7 @@ import com.kurashiru.kurashirutrial.databinding.FragmentRecipeListBinding;
 import com.kurashiru.kurashirutrial.databinding.ViewRecipeBinding;
 import com.kurashiru.kurashirutrial.view.customView.ArrayRecyclerAdapter;
 import com.kurashiru.kurashirutrial.view.customView.BindingHolder;
+import com.kurashiru.kurashirutrial.view.customView.ItemDecorationAlbumColumns;
 import com.kurashiru.kurashirutrial.viewModel.FavoriteListViewModel;
 import com.kurashiru.kurashirutrial.viewModel.RecipeViewModel;
 
@@ -62,7 +63,8 @@ public class FavoriteListFragment extends BaseFragment {
         RecipeListAdapter adapter = new RecipeListAdapter(getContext(), viewModel.getRecipeViewModels());
         mBinding.recyclerView.setAdapter(adapter);
         mBinding.recyclerView.setHasFixedSize(true);
-//        mBinding.recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), R.drawable.divider));
+        mBinding.recyclerView.setClipToPadding(false);
+        mBinding.recyclerView.addItemDecoration(new ItemDecorationAlbumColumns(1, 2));
         mBinding.recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
     }
 

@@ -78,7 +78,6 @@ public class RecipeViewModel extends BaseObservable implements ViewModel {
     }
 
     private Recipe convertToViewModel() {
-        //FIXME
         Recipe recipe = new Recipe();
         recipe.setId(mId);
         recipe.setType("video");
