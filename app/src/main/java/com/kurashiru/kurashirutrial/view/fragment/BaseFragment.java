@@ -31,20 +31,10 @@ public abstract class BaseFragment extends Fragment {
         }
     }
 
-    void showSnackbar(int messageResouce, int actionTextResouce, View.OnClickListener listener){
-        Activity activity = getActivity();
-        if (activity != null) {
-            final View viewPos = activity.findViewById(R.id.myCoordinatorLayout);
-            Snackbar.make(viewPos, messageResouce, Snackbar.LENGTH_LONG)
-                    .setAction(actionTextResouce, listener)
-                    .show();
-        }
-    }
-
     void showSnackbar(String message, int actionTextResouce, View.OnClickListener listener){
         Activity activity = getActivity();
         if (activity != null) {
-            final View viewPos = activity.findViewById(R.id.myCoordinatorLayout);
+            final View viewPos = activity.findViewById(R.id.content_view);
             Snackbar.make(viewPos, message, Snackbar.LENGTH_LONG)
                     .setAction(actionTextResouce, listener)
                     .show();

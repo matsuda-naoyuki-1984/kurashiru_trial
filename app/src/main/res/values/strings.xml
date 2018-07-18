@@ -2,7 +2,6 @@
     <string name="app_name">kurashiruTrial</string>
     <string name="title_home">Home</string>
     <string name="title_favorite">Favorite</string>
-    <string name="title_notifications">Notifications</string>
 
     <string name="recipe">Recipe</string>
     <string name="favorite">Favorite</string>

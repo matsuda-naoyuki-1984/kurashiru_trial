@@ -48,8 +48,6 @@ public class MainActivity extends BaseActivity {
             case R.id.navigation_favorite:
                 switchFragment(mFavoriteListFragment, RecipeListFragment.TAG);
                 return true;
-            case R.id.navigation_help:
-                return true;
         }
         return false;
     };
