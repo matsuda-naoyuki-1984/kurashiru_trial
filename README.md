@@ -1,4 +1,8 @@
-[Kurashiru trial] 松田直之 on 19th july 2018.
+# Kurashiru trial
+on 19th july 2018.
+
+# 作成者
+ 松田直之
 
 # Features
 
