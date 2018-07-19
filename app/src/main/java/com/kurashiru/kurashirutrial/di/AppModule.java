@@ -14,6 +14,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.disposables.CompositeDisposable;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -40,6 +41,12 @@ public class AppModule {
     public Interceptor provideRequestInterceptor(RequestInterceptor interceptor) {
         return interceptor;
     }
+
+    @Provides
+    public CompositeDisposable provideCompositeDisposable() {
+        return new CompositeDisposable();
+    }
+
 
     @Provides
     public DefaultPreference provideDefaultPreference() {

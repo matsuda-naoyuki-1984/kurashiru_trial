@@ -45,6 +45,12 @@ public class FavoriteListFragment extends BaseFragment {
     }
 
     @Override
+    public void onDetach() {
+        viewModel.destroy();
+        super.onDetach();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         viewModel.start();

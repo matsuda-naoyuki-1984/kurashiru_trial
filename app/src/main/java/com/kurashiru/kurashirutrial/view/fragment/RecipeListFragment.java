@@ -1,6 +1,5 @@
 package com.kurashiru.kurashirutrial.view.fragment;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.databinding.ObservableList;
 import android.os.Bundle;
@@ -23,6 +22,7 @@ import com.kurashiru.kurashirutrial.viewModel.RecipeViewModel;
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -35,7 +35,8 @@ public class RecipeListFragment extends BaseFragment {
 
     FragmentRecipeListBinding mBinding;
 
-    private AlertDialog mConfirmDialog;
+    @Inject
+    CompositeDisposable mCompositeDisposable;
 
     public static RecipeListFragment newInstance() {
         return new RecipeListFragment();
@@ -48,6 +49,13 @@ public class RecipeListFragment extends BaseFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         getComponent().inject(this);
+    }
+
+    @Override
+    public void onDetach() {
+        viewModel.destroy();
+        mCompositeDisposable.clear();
+        super.onDetach();
     }
 
     @Override
@@ -77,7 +85,6 @@ public class RecipeListFragment extends BaseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mConfirmDialog = null;
     }
 
 
@@ -127,23 +134,15 @@ public class RecipeListFragment extends BaseFragment {
             itemBinding.setViewModel(viewModel);
             itemBinding.executePendingBindings();
             holder.itemView.setOnClickListener(view -> {
-                final int clickedItemPosition = holder.getAdapterPosition();
-                onItemClicked(getItem(clickedItemPosition));
+                if (viewModel.getFavorite() == 0) {
+                    addToFavorite(viewModel);
+                } else {
+                    viewModel.removeFavorite();
+                }
             });
         }
 
-        private void onItemClicked(RecipeViewModel viewModel) {
-            mConfirmDialog = new AlertDialog.Builder(getActivity())
-                    .setTitle("title")
-                    .setMessage("Add to favorite?")
-                    .setPositiveButton("OK",
-                            (dialog, which) -> addToFavorite(viewModel))
-                    .setNegativeButton("Cancel", null)
-                    .show();
-        }
-
         private void addToFavorite(RecipeViewModel viewModel){
-            //FIXME
             Disposable disposable = viewModel.addToFavorite()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -153,10 +152,10 @@ public class RecipeListFragment extends BaseFragment {
                                 .getResources()
                                 .getString(R.string.snackbar_message_added_to_favorites),
                                 viewModel.getTitle());
-                        showSnackbar(message, R.string.snackbar_button_message, view -> {
-                            viewModel.removeFavorite();
-                        });
+                        showSnackbar(message, R.string.snackbar_button_message,
+                                view ->  viewModel.removeFavorite());
                     }, throwable -> {});
+            mCompositeDisposable.add(disposable);
         }
 
 
