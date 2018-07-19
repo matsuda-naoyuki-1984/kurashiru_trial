@@ -18,6 +18,8 @@ import com.kurashiru.kurashirutrial.view.customView.BindingHolder;
 import com.kurashiru.kurashirutrial.view.customView.ItemDecorationAlbumColumns;
 import com.kurashiru.kurashirutrial.viewModel.RecipeListViewModel;
 import com.kurashiru.kurashirutrial.viewModel.RecipeViewModel;
+import com.kurashiru.kurashirutrial.viewModel.event.FavoriteUpdatedEvent;
+import com.squareup.otto.Bus;
 
 import javax.inject.Inject;
 
@@ -34,6 +36,9 @@ public class RecipeListFragment extends BaseFragment {
     RecipeListViewModel viewModel;
 
     FragmentRecipeListBinding mBinding;
+
+    @Inject
+    Bus mEventBus;
 
     @Inject
     CompositeDisposable mCompositeDisposable;
@@ -137,7 +142,7 @@ public class RecipeListFragment extends BaseFragment {
                 if (viewModel.getFavorite() == 0) {
                     addToFavorite(viewModel);
                 } else {
-                    viewModel.removeFavorite();
+                    removeFavorite(viewModel);
                 }
             });
         }
@@ -147,13 +152,22 @@ public class RecipeListFragment extends BaseFragment {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(result -> {
-
                         String message = String.format(getContext()
                                 .getResources()
                                 .getString(R.string.snackbar_message_added_to_favorites),
                                 viewModel.getTitle());
                         showSnackbar(message, R.string.snackbar_button_message,
-                                view ->  viewModel.removeFavorite());
+                                view ->  removeFavorite(viewModel));
+                        mEventBus.post(new FavoriteUpdatedEvent());
+                    }, throwable -> {});
+            mCompositeDisposable.add(disposable);
+        }
+
+        private void removeFavorite(RecipeViewModel viewModel){
+            Disposable disposable = viewModel.removeFavorite().subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(result -> {
+                        mEventBus.post(new FavoriteUpdatedEvent());
                     }, throwable -> {});
             mCompositeDisposable.add(disposable);
         }

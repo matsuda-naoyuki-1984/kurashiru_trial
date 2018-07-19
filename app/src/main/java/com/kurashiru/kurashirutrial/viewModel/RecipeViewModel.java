@@ -14,7 +14,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 @FragmentScope
@@ -29,7 +28,7 @@ public class RecipeViewModel extends BaseObservable implements ViewModel {
 
     private int mFavorite;
 
-    FavoritesRepository mFavoritesRepository;
+    private FavoritesRepository mFavoritesRepository;
 
     private CompositeDisposable mCompositeDisposable;
 
@@ -77,12 +76,13 @@ public class RecipeViewModel extends BaseObservable implements ViewModel {
                 });
     }
 
-    public void removeFavorite() {
-        Disposable disposable = mFavoritesRepository.removeFavorite(convertToViewModel())
+    public Single<Boolean> removeFavorite() {
+        return mFavoritesRepository.removeFavorite(convertToViewModel())
                 .subscribeOn(Schedulers.io())
-                .subscribe(aBoolean -> setFavorite(false), throwable -> {
+                .map(result -> {
+                    setFavorite(false);
+                    return result;
                 });
-        mCompositeDisposable.add(disposable);
     }
 
     private Recipe convertToViewModel() {

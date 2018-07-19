@@ -11,6 +11,9 @@ import com.kurashiru.kurashirutrial.BR;
 import com.kurashiru.kurashirutrial.di.scope.FragmentScope;
 import com.kurashiru.kurashirutrial.model.RecipeData;
 import com.kurashiru.kurashirutrial.repository.favorite.FavoritesRepository;
+import com.kurashiru.kurashirutrial.viewModel.event.FavoriteUpdatedEvent;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
@@ -32,12 +35,17 @@ public class FavoriteListViewModel extends BaseObservable implements ViewModel {
 
     private CompositeDisposable mCompositeDisposable;
 
+    private final Bus mEventBus;
+
     @Inject
     public FavoriteListViewModel(FavoritesRepository favoritesRepository,
-                                 CompositeDisposable compositeDisposable) {
+                                 CompositeDisposable compositeDisposable,
+                                 Bus bus) {
         mRecipeViewModels = new ObservableArrayList<>();
         mFavoritesRepository = favoritesRepository;
         mCompositeDisposable = compositeDisposable;
+        mEventBus = bus;
+        mEventBus.register(this);
     }
 
     @Bindable
@@ -55,11 +63,12 @@ public class FavoriteListViewModel extends BaseObservable implements ViewModel {
     }
 
     public void start(){
-        loadRecipes();
+        if (mRecipeViewModels.isEmpty()) {
+            loadRecipes();
+        }
     }
 
     private void loadRecipes() {
-        //TODO
         setLoadingVisibility(View.VISIBLE);
 
         Disposable disposable = mFavoritesRepository
@@ -75,7 +84,8 @@ public class FavoriteListViewModel extends BaseObservable implements ViewModel {
 
     private List<RecipeViewModel> convertToViewModel(RecipeData recipeData) {
         return Stream.of(recipeData.getData()).map(recipe ->
-                new RecipeViewModel(recipe, mFavoritesRepository, mCompositeDisposable)).toList();
+                new RecipeViewModel(recipe, mFavoritesRepository,
+                        mCompositeDisposable)).toList();
     }
 
     private void renderRecipeViews(List<RecipeViewModel> recipeViewModels) {
@@ -84,8 +94,13 @@ public class FavoriteListViewModel extends BaseObservable implements ViewModel {
         setLoadingVisibility(View.GONE);
     }
 
+    @Subscribe
+    public void onFavoriteUpdated(FavoriteUpdatedEvent event) {
+        loadRecipes();
+    }
+
     @Override
     public void destroy() {
-        mCompositeDisposable.clear();
+        mEventBus.unregister(this);
     }
 }

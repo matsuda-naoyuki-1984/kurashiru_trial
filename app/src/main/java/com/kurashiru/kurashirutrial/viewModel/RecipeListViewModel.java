@@ -60,15 +60,13 @@ public class RecipeListViewModel extends BaseObservable implements ViewModel {
     }
 
     public void start() {
+        if (!mRecipeViewModels.isEmpty()){
+            return;
+        }
         loadRecipes();
     }
 
     private void loadRecipes() {
-
-        if (!mRecipeViewModels.isEmpty()){
-            return;
-        }
-
         setLoadingVisibility(View.VISIBLE);
 
         Disposable favoriteDisposable = mFavoritesRepository.findAll()
@@ -90,7 +88,8 @@ public class RecipeListViewModel extends BaseObservable implements ViewModel {
 
     private List<RecipeViewModel> convertToViewModel(RecipeData recipeData) {
         return Stream.of(recipeData.getData()).map(recipe ->
-                new RecipeViewModel(recipe, mFavoritesRepository, mCompositeDisposable)).toList();
+                new RecipeViewModel(recipe, mFavoritesRepository,
+                        mCompositeDisposable)).toList();
     }
 
     private void renderRecipeViews(List<RecipeViewModel> recipeViewModels) {

@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder;
 import com.kurashiru.kurashirutrial.api.RequestInterceptor;
 import com.kurashiru.kurashirutrial.api.service.KurashiruService;
 import com.kurashiru.kurashirutrial.pref.DefaultPreference;
+import com.squareup.otto.Bus;
 
 import javax.inject.Singleton;
 
@@ -47,6 +48,11 @@ public class AppModule {
         return new CompositeDisposable();
     }
 
+    @Singleton
+    @Provides
+    public Bus provideBus() {
+        return new Bus();
+    }
 
     @Provides
     public DefaultPreference provideDefaultPreference() {
